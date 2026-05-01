@@ -1,8 +1,18 @@
 import "dotenv/config";
-import { catalog } from "../data/catalog.js";
+import { generateBulkCatalog } from "../data/generateBulkCatalog.js";
 import { getPool, closePool } from "./pool.js";
 
+const countRaw = process.env.SEED_PRODUCT_COUNT;
+const count =
+  countRaw != null && countRaw !== "" ? Number(countRaw) : 500;
+
+if (!Number.isFinite(count) || count < 1 || count > 20000) {
+  console.error("SEED_PRODUCT_COUNT debe ser un entero entre 1 y 20000 (por defecto 500).");
+  process.exit(1);
+}
+
 async function main() {
+  const catalog = generateBulkCatalog(count);
   const pool = getPool();
   const client = await pool.connect();
   try {
@@ -33,7 +43,14 @@ async function main() {
     }
 
     await client.query("COMMIT");
-    console.log(`Seed completado: ${catalog.length} productos.`);
+    const { rows } = await pool.query(`
+      SELECT
+        (SELECT COUNT(*)::int FROM products) AS products,
+        (SELECT COUNT(*)::int FROM product_variations) AS variations
+    `);
+    console.log(
+      `Seed completado: ${rows[0].products} productos, ${rows[0].variations} variaciones en total.`,
+    );
   } catch (e) {
     await client.query("ROLLBACK");
     throw e;

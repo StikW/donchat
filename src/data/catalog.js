@@ -1,5 +1,6 @@
 /**
- * Datos iniciales para `npm run db:seed`. La API lee desde PostgreSQL.
+ * Catálogo demo pequeño (referencia). El seed por defecto usa `generateBulkCatalog.js` (~500 ítems).
+ * Para volver a pocas filas: `npm run db:seed:demo`
  */
 
 export const catalog = [
