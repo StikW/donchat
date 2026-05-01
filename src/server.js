@@ -4,7 +4,7 @@ import { getPool } from "./db/pool.js";
 import { productsRouter } from "./routes/products.js";
 
 const app = express();
-const PORT = process.env.PORT ?? 3001;
+const PORT = process.env.PORT ?? 3000;
 
 app.use(express.json());
 
